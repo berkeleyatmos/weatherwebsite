@@ -10,9 +10,6 @@ app = Flask(__name__)
 def home():
    return render_template('CalDayVis.html')
    #return render_template('Debug.html')
-#@app.route('/')
-#def hello_world():
-#    return 'Hello World!'
 
 @app.route('/data')
 def get_data():
@@ -28,7 +25,6 @@ def get_data():
    sql_hostname = 'mysql'
    sql_username='ankurmahesh'
 
-   sql_password = ''
    #sql_password = os.environ["SQL_PASSWORD"]
 
    #with open("sql_password", "r") as f:
