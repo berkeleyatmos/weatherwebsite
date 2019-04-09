@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style> /* set the CSS */
+
+.line {
+  fill: none;
+  stroke-width: 4px;
+}
+
+</style>
+<body>
+
+<title>Atmos Weather Station</title>
+
+<!-- load the d3.js library -->    	
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+// set the dimensions and margins of the graph
+var margin = {top: 30, right: 20, bottom: 50, left: 120},
+    width = 960 - margin.left - margin.right,
+    height = 1500 - margin.top - margin.bottom,
+	windowWidth = window.innerWidth,
+	windowHeight = window.innerHeight;
+
+var plot_margin = 50;
+
+// parse the date / time
+var parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
+
+// append the svg obgect to the body of the page
+// appends a 'group' element to 'svg'
+// moves the 'group' element to the top left margin
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+// Get the data
+//d3.json("data1.json", function(error, data) {
+d3.json("https://www.ocf.berkeley.edu/~ankurmahesh/weatherwebsite/data", function(error, data) {
+    if (error) throw error;
+
+    // format the data
+	for (var i in data) {
+		data[i].date = parseTime(data[i].date);
+		if (data[i].humi < 0) {
+			if (i == 0) {
+				var rh = 0;
+				data[i].humi = rh;
+			}
+			data[i].humi = rh;
+		}
+		var rh = data[i].humi;
+	}
+
+    //// TEMP1
+    // set the ranges
+    var x = d3.scaleTime().range([0, width]);
+    var y = d3.scaleLinear().range([height/3 - plot_margin, 0 + plot_margin]);
+    
+    // define the line
+    var valueline = d3.line()
+        .x(function(d) { return x(d.date); })
+        .y(function(d) { return y(d.temp1); });
+
+    // Scale the range of the data
+    x.domain(d3.extent(data, function(d) { return d.date; }));
+    y.domain([d3.min(data, function(d) { return d.temp1 - 0.5; }), d3.max(data, function(d) { return d.temp1 + 0.5; })]);
+
+    // Add the valueline path.
+    svg.append("path")
+        .data([data])
+        .attr("class", "line")
+        .attr("stroke", "steelblue")
+        .attr("d", valueline);
+        
+    // Add the scatterplot
+    svg.selectAll("dot")
+        .data(data)
+      .enter().append("circle")
+        .attr("r", 5)
+        .attr("cx", function(d) { return x(d.date); })
+        .attr("cy", function(d) { return y(d.temp1); })
+        .attr("fill", "steelblue");
+
+    // Add the X Axis
+    svg.append("g")
+        .attr("transform", "translate(0," + (height/3 - plot_margin) + ")")
+        .call(d3.axisBottom(x))
+        .attr("font-size", 15);
+    // text label for the x axis
+    svg.append("text")             
+        .attr("transform", "translate(" + (width/2) + " ," + (height/3 + margin.top + 20 - plot_margin) + ")")
+        .style("text-anchor", "middle")
+        .attr("font-size", 20)
+        .attr("font-family", "sans-serif")
+        .text("Time");
+
+    // Add the Y Axis
+    svg.append("g")
+        .call(d3.axisLeft(y))
+        .attr("font-size", 15);
+    // text label for the y axis
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - margin.left)
+        .attr("x",0 - (height / 3 / 2))
+        .attr("dy", "2em")
+        .style("text-anchor", "middle")
+        .attr("font-size", 20)
+        .attr("font-family", "sans-serif")
+        .text("Temp (C)");   
+
+    // text label for the title
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", plot_margin)
+        .style("text-anchor", "middle")
+        .attr("font-size", 25)
+        .attr("font-family", "sans-serif")
+        .text("Weatherstation Temp data");   
+
+    //// HUMI
+    // set the ranges
+    var x = d3.scaleTime().range([0, width]);
+    var y = d3.scaleLinear().range([2*height/3 - plot_margin, height/3 + plot_margin]);
+    
+    // define the line
+    var valueline = d3.line()
+        .x(function(d) { return x(d.date); })
+        .y(function(d) { return y(d.humi); });
+
+    // Scale the range of the data
+    x.domain(d3.extent(data, function(d) { return d.date; }));
+    y.domain([0, 100]);
+
+    // Add the valueline path.
+    svg.append("path")
+        .data([data])
+        .attr("class", "line")
+        .attr("stroke", "purple")
+        .attr("d", valueline);
+        
+    // Add the scatterplot
+    svg.selectAll("dot")
+        .data(data)
+      .enter().append("circle")
+        .attr("r", 5)
+        .attr("cx", function(d) { return x(d.date); })
+        .attr("cy", function(d) { return y(d.humi); })
+        .attr("fill", "purple");
+
+    // Add the X Axis
+    svg.append("g")
+        .attr("transform", "translate(0," + (2*height/3 - plot_margin) + ")")
+        .call(d3.axisBottom(x))
+        .attr("font-size", 15);
+    // text label for the x axis
+    svg.append("text")             
+        .attr("transform", "translate(" + (width/2) + " ," + (2*height/3 + margin.top + 20 -plot_margin) + ")")
+        .style("text-anchor", "middle")
+        .attr("font-size", 20)
+        .attr("font-family", "sans-serif")
+        .text("Time");
+
+    // Add the Y Axis
+    svg.append("g")
+        .call(d3.axisLeft(y))
+        .attr("font-size", 15);
+    // text label for the y axis
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - margin.left)
+        .attr("x",0 - (2 * height / 3 - height / 6))
+        .attr("dy", "2em")
+        .style("text-anchor", "middle")
+        .attr("font-size", 20)
+        .attr("font-family", "sans-serif")
+        .text("Relative Humidity (%)");   
+
+    // text label for the title
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", height/3 + plot_margin/2)
+        .style("text-anchor", "middle")
+        .attr("font-size", 25)
+        .attr("font-family", "sans-serif")
+        .text("Weatherstation Humidity data");   
+
+    //// PRES
+    // set the ranges
+    var x = d3.scaleTime().range([0, width]);
+    var y = d3.scaleLinear().range([height - plot_margin, 2*height/3 + plot_margin]);
+    
+    // define the line
+    var valueline = d3.line()
+        .x(function(d) { return x(d.date); })
+        .y(function(d) { return y(d.pres); });
+
+    // Scale the range of the data
+    x.domain(d3.extent(data, function(d) { return d.date; }));
+    y.domain([d3.min(data, function(d) { return d.pres - 1; }), d3.max(data, function(d) { return d.pres + 1; })]);
+
+    // Add the valueline path.
+    svg.append("path")
+        .data([data])
+        .attr("class", "line")
+        .attr("stroke", "red")
+        .attr("d", valueline);
+        
+    // Add the scatterplot
+    svg.selectAll("dot")
+        .data(data)
+      .enter().append("circle")
+        .attr("r", 5)
+        .attr("cx", function(d) { return x(d.date); })
+        .attr("cy", function(d) { return y(d.pres); })
+        .attr("fill", "red");
+
+    // Add the X Axis
+    svg.append("g")
+        .attr("transform", "translate(0," + (height - plot_margin) + ")")
+        .call(d3.axisBottom(x))
+        .attr("font-size", 15);
+    // text label for the x axis
+    svg.append("text")             
+        .attr("transform", "translate(" + (width/2) + " ," + (height + margin.top + 20 - plot_margin) + ")")
+        .style("text-anchor", "middle")
+        .attr("font-size", 20)
+        .attr("font-family", "sans-serif")
+        .text("Time");
+
+    // Add the Y Axis
+    svg.append("g")
+        .call(d3.axisLeft(y))
+        .attr("font-size", 15);
+    // text label for the y axis
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - margin.left)
+        .attr("x",0 - (height - height / 6))
+        .attr("dy", "2em")
+        .style("text-anchor", "middle")
+        .attr("font-size", 20)
+        .attr("font-family", "sans-serif")
+        .text("Pressure (hPa)")   
+
+    // text label for the title
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", 2*height/3 + plot_margin/2)
+        .style("text-anchor", "middle")
+        .attr("font-size", 25)
+        .attr("font-family", "sans-serif")
+        .text("Weatherstation Pressure data");   
+});
+</script>
+</body>
+
