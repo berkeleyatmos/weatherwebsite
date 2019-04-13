@@ -8,7 +8,8 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-   return render_template('CalDayVis.html')
+   entries = request.args.get('entries', 500)
+   return render_template('CalDayVis.html', entries=entries)
    #return render_template('Debug.html')
 
 @app.route('/data')
@@ -25,6 +26,7 @@ def get_data():
    sql_hostname = 'mysql'
    sql_username='ankurmahesh'
 
+   sql_password = 'b1C4ZcoJR8lTXMm3EocB46ek'
    #sql_password = os.environ["SQL_PASSWORD"]
 
    #with open("sql_password", "r") as f:
