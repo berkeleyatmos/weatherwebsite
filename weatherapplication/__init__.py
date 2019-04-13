@@ -26,8 +26,7 @@ def get_data():
    sql_hostname = 'mysql'
    sql_username='ankurmahesh'
 
-   sql_password = ''
-   #sql_password = os.environ["SQL_PASSWORD"]
+   sql_password = os.environ["SQL_PASSWORD"]
 
    #with open("sql_password", "r") as f:
    #    sql_password = f.read().replace("\n", "")
