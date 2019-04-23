@@ -104,24 +104,27 @@ function update(i) {
         if (error) throw error;
     
         // format the data
-        var rh_replacement = -1;
-        for (var i in data) {
+      // var rh_replacement = -1;
+       for (var i in data) {
 			// parse the dates
             data[i].date = parseTime(data[i].date);
 			// fix the -999.0's in RH
-            if (data[i].humi < 0) {
-                if (rh_replacement < 0 ) {
-					var j = i;
-					while (rh_replacement < 0) {
-						rh_replacement = data[j].humi;
-						j++;
-					}
-                    data[i].humi = rh_replacement;
-                } else {
-                	data[i].humi = rh_replacement;
-				}
-            }
-			rh_replacement = data[i].humi;
+      //      if (data[i].humi < 0) {
+     //           if (rh_replacement < 0 ) {
+//					var j = i;
+//					while ((rh_replacement < 0) && (j > 0)) {
+//						rh_replacement = data[j].humi;
+//						j--;
+//					}
+//					if (rh_replacement < 0) {
+//						rh_replacement = 0.0
+//					}
+//                  data[i].humi = rh_replacement;
+//                } else {
+//              	data[i].humi = rh_replacement;
+//				}
+//            }
+//			rh_replacement = data[i].humi;
         }
 
 		// loop through the types of data

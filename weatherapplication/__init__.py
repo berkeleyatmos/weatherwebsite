@@ -3,6 +3,7 @@ import pymysql
 from sshtunnel import SSHTunnelForwarder
 import pandas as pd
 import os
+import numpy as np
 
 app = Flask(__name__)
 
@@ -46,8 +47,15 @@ def get_data():
    #N is the "entries" variable 
    if entries is not None:
        data = data.tail(int(entries))
+   
    data["date"] = data["date"].dt.strftime("%Y-%m-%d %H:%M:%S")
    conn.close()
+   for field in ["humi", "temp1", "pres"]:
+       if np.any(data[field].values < 0):
+           data[field][data[field] < 0] = np.nan
+           data[field] = data[field].interpolate(limit=10)
+           data[field][data[field].isnull()] = 0
+
    return data.to_json(orient='records')
 
 
